@@ -1,6 +1,7 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useContext } from "react";
 import { RecordContext } from "../context/RecordContext";
+import { PrimaryBtn } from "../components/common/PrimaryBtn";
 
 export default function HomePage() {
   const location = useLocation();
@@ -45,26 +46,23 @@ export default function HomePage() {
           <p>No record found</p>
         )}
 
-        <button
-          onClick={() => handleNavigate("/monthChart")}
-          className="bg-slate-500 py-7"
-        >
-          اظهر كل المصروفات
-        </button>
+        <PrimaryBtn
+          handleNavigate={handleNavigate}
+          path="/monthChart"
+          text="اظهر كل المصروفات"
+        />
 
-        <button
-          onClick={() => handleNavigate("/addMasrof")}
-          className="bg-slate-500 py-7"
-        >
-          اضافة مصروف جديد
-        </button>
+        <PrimaryBtn
+          handleNavigate={handleNavigate}
+          path="/addMasrof"
+          text="اضافة مصروف جديد"
+        />
 
-        <button
-          onClick={() => handleNavigate("/editMonthBudget")}
-          className="bg-slate-500 py-7"
-        >
-          تعديل مصروف الشهر
-        </button>
+        <PrimaryBtn
+          handleNavigate={handleNavigate}
+          path="/editMonthBudget"
+          text="تعديل مصروف الشهر"
+        />
       </div>
     </div>
   );

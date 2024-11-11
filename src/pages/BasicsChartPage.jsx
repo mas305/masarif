@@ -1,28 +1,13 @@
+// BasicsChartPage.js
 import { useContext, useEffect } from "react";
 import { RecordContext } from "../context/RecordContext";
-import { Pie } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-} from "chart.js";
 import { useLocation, useNavigate } from "react-router-dom";
-
-// Register Chart.js components
-ChartJS.register(
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-  CategoryScale,
-  LinearScale,
-  BarElement
-);
+import { TotalMoney } from "../components/common/TotalMoney";
+import BasicsChart from "../components/charts/PieChart";
+import { PrimaryBtn } from "../components/common/PrimaryBtn";
+import { SecondaryBtn } from "../components/common/SecondaryBtn";
+import PieChart from "../components/charts/PieChart";
+import { handleNavigate } from "../utils";
 
 export function BasicsChartPage() {
   const location = useLocation();
@@ -45,52 +30,37 @@ export function BasicsChartPage() {
   // Filter items based on the "basics" category
   const basicsItems = items.filter((item) => item.category === "basics");
 
-  // Calculate the total price for basics items
-  const totalBasicsPrice = basicsItems.reduce(
-    (total, item) => total + parseFloat(item.price),
-    0
-  );
-
-  // Function to generate random colors for the pie chart segments
-  const generateRandomColor = () => {
-    const letters = "0123456789ABCDEF";
-    let color = "#";
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  };
-
-  // Data for the pie chart (showing only basics items) with unique colors for each item
-  const pieData = {
-    labels: basicsItems.map((item) => item.itemName), // Each item name as a label
-    datasets: [
-      {
-        label: "Basics Items Price Distribution",
-        data: basicsItems.map((item) => parseFloat(item.price)), // Prices of each basics item
-        backgroundColor: basicsItems.map(() => generateRandomColor()), // Generate a unique color for each item
-        borderColor: ["#FFFFFF"],
-        borderWidth: 1,
-      },
-    ],
-  };
-
   return (
     <div className="max-w-md mx-auto p-4 bg-white shadow-md rounded">
       <h2 className="text-2xl font-semibold mb-4">Basics Category Chart</h2>
 
       {/* Pie Chart (Basics Item Distribution) */}
-      <div className="mb-6">
-        <h3 className="text-xl font-semibold mb-4">
-          Basics Items Distribution
-        </h3>
-        <Pie data={pieData} />
-      </div>
+      <PieChart chartItems={basicsItems} title="Basics Items Distribution" />
 
       <div className="text-center">
         <h3 className="text-xl font-semibold mb-4">Basics Items Overview</h3>
-        <p>Total Basics Price: ${totalBasicsPrice.toFixed(2)}</p>
+        <p>Total Basics Price:</p>
+        <TotalMoney items={items} type="basics" />
       </div>
+
+      {/* Buttons to navigate */}
+      <div className="text-white p-3 font-bold flex flex-col mt-11 gap-y-12">
+        <PrimaryBtn
+          handleNavigate={() => {
+            handleNavigate(navigate, "/monthChart", id);
+          }}
+          text="المصروفات الشهر"
+        />
+
+        <SecondaryBtn
+          handleNavigate={() => {
+            handleNavigate(navigate, "/OthersChart", id);
+          }}
+          text="المصروفات الأخرى"
+        />
+      </div>
+
+      <div className="text-white p-3 font-bold flex flex-col mt-11 gap-y-12"></div>
     </div>
   );
 }

@@ -1,14 +1,16 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ItemContext } from "../../context/ItemContext";
+import { useLocation, useNavigate } from "react-router-dom";
 import { RecordContext } from "../../context/RecordContext";
+import { PrimaryBtn } from "./PrimaryBtn";
 
 function MasrofForm() {
+  const [itemName, setItemName] = useState("");
+  const [price, setPrice] = useState("");
+  const [category, setCategory] = useState("basics"); // Default to "basics"
   const location = useLocation();
   const navigate = useNavigate();
   const { id } = location.state || {}; // Get the id from location state
   const { record, setRecord } = useContext(RecordContext);
-  const { items, setItems } = useContext(ItemContext);
 
   useEffect(() => {
     if (id) {
@@ -18,10 +20,6 @@ function MasrofForm() {
       }
     }
   }, [id, setRecord]);
-
-  const [itemName, setItemName] = useState("");
-  const [price, setPrice] = useState("");
-  const [category, setCategory] = useState("basics"); // Default to "basics"
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -51,6 +49,7 @@ function MasrofForm() {
     setPrice("");
     setCategory("basics"); // Reset category to default
   };
+
   const handleNavigate = (path) => {
     navigate(path, { state: { id } });
   };
@@ -124,13 +123,13 @@ function MasrofForm() {
         </button>
       </form>
 
-      <button
-        type="button"
-        className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        onClick={() => handleNavigate("/monthChart")}
-      >
-        عرض مصروفات الشهر
-      </button>
+      <div className="text-white p-3 font-bold flex flex-col mt-11 gap-y-12">
+        <PrimaryBtn
+          handleNavigate={handleNavigate}
+          path="/monthChart"
+          text="عرض مصروفات الشهر"
+        />
+      </div>
 
       {/* Display Saved Items */}
       <div className="mt-6">

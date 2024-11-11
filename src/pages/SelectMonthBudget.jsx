@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 export default function SelectMonthBudget() {
   const navigate = useNavigate();
   const currentYear = new Date().getFullYear();
-  const [selectedYear, setSelectedYear] = useState(currentYear);
+  // const [currentYear, setcurrentYear] = useState(currentYear);
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedBudget, setSelectedBudget] = useState("");
   const [disabledMonths, setDisabledMonths] = useState([]);
@@ -63,7 +63,7 @@ export default function SelectMonthBudget() {
     const id = `${Date.now()}-${Math.floor(Math.random() * 10000)}`;
     const selectedData = {
       id,
-      year: selectedYear,
+      year: currentYear,
       month: selectedMonth,
       budget: selectedBudget,
     };
@@ -86,9 +86,9 @@ export default function SelectMonthBudget() {
 
   useEffect(() => {
     if (selectedMonth) {
-      checkDuplicate(selectedYear, selectedMonth);
+      checkDuplicate(currentYear, selectedMonth);
     }
-  }, [selectedYear, selectedMonth]);
+  }, [currentYear, selectedMonth]);
 
   return (
     <div className="max-w-md mx-auto p-4 bg-white shadow-md rounded">
