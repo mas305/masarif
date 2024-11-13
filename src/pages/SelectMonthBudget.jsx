@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function SelectMonthBudget() {
+export default function SelectBudget() {
   const navigate = useNavigate();
   const currentYear = new Date().getFullYear();
-  // const [currentYear, setcurrentYear] = useState(currentYear);
   const [selectedMonth, setSelectedMonth] = useState("");
+  const [customBudgetName, setCustomBudgetName] = useState("");
   const [selectedBudget, setSelectedBudget] = useState("");
   const [disabledMonths, setDisabledMonths] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
@@ -33,12 +33,12 @@ export default function SelectMonthBudget() {
     setDisabledMonths(savedDisabledMonths);
   }, []);
 
-  const checkDuplicate = (year, month) => {
+  const checkDuplicate = (year, budgetName) => {
     const allRecords = Object.keys(localStorage).map((key) =>
       JSON.parse(localStorage.getItem(key))
     );
     const duplicateRecord = allRecords.find(
-      (record) => record.year === year && record.month === month
+      (record) => record.year === year && record.budgetName === budgetName
     );
 
     if (duplicateRecord) {
@@ -53,74 +53,101 @@ export default function SelectMonthBudget() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const budgetName = customBudgetName.trim() || selectedMonth;
+
+    if (!budgetName) {
+      setErrorMessage("Please provide a valid budget name.");
+      return;
+    }
+
     if (isDuplicate) {
-      // Navigate to /monthChart if record already exists
       navigate("/masrofDetails", { state: { id: existingId } });
       return;
     }
 
-    // Generate a unique ID for the new record
     const id = `${Date.now()}-${Math.floor(Math.random() * 10000)}`;
     const selectedData = {
       id,
       year: currentYear,
-      month: selectedMonth,
+      budgetName,
       budget: selectedBudget,
     };
 
-    // Save the record to localStorage
     localStorage.setItem(id, JSON.stringify(selectedData));
 
-    // Update disabled months
-    const updatedDisabledMonths = [...disabledMonths, selectedMonth];
-    localStorage.setItem(
-      "disabledMonths",
-      JSON.stringify(updatedDisabledMonths)
-    );
-    setDisabledMonths(updatedDisabledMonths);
+    if (selectedMonth) {
+      const updatedDisabledMonths = [...disabledMonths, selectedMonth];
+      localStorage.setItem(
+        "disabledMonths",
+        JSON.stringify(updatedDisabledMonths)
+      );
+      setDisabledMonths(updatedDisabledMonths);
+    }
 
-    // Clear the error message and navigate to the home page
     setErrorMessage("");
     navigate("/masrofDetails", { state: { id } });
   };
 
   useEffect(() => {
-    if (selectedMonth) {
-      checkDuplicate(currentYear, selectedMonth);
+    const budgetName = customBudgetName.trim() || selectedMonth;
+    if (budgetName) {
+      checkDuplicate(currentYear, budgetName);
     }
-  }, [currentYear, selectedMonth]);
+  }, [currentYear, selectedMonth, customBudgetName]);
 
   return (
     <div className="max-w-md mx-auto p-4 bg-white shadow-md rounded">
-      <h2 className="text-2xl font-semibold mb-4">Select Month and Year</h2>
+      <h2 className="text-2xl font-semibold mb-4">Select Budget</h2>
       {errorMessage && <p className="text-red-500 mb-4">{errorMessage}</p>}
       <form onSubmit={handleSubmit}>
         <h3 className="text-6xl font-bold text-center my-12">{currentYear}</h3>
 
         <label htmlFor="month" className="block text-sm font-medium mb-2">
-          Select Month
+          Select Month (or provide a custom name)
         </label>
         <select
           id="month"
           value={selectedMonth}
-          onChange={(e) => setSelectedMonth(e.target.value)}
+          onChange={(e) => {
+            setSelectedMonth(e.target.value);
+            setCustomBudgetName("");
+          }}
           className="w-full p-2 mb-4 border rounded"
+          disabled={customBudgetName}
         >
           <option value="" disabled>
             Select a month
           </option>
           {months.map((month, index) => (
-            <option key={index} value={month}>
+            <option
+              key={index}
+              value={month}
+              disabled={disabledMonths.includes(month)}
+            >
               {month}
             </option>
           ))}
         </select>
 
-        {/* Show the budget input only if the selection is not a duplicate */}
-        {!isDuplicate && selectedMonth && (
+        <label htmlFor="customName" className="block text-sm font-medium mb-2">
+          Or enter a custom budget name
+        </label>
+        <input
+          type="text"
+          id="customName"
+          value={customBudgetName}
+          onChange={(e) => {
+            setCustomBudgetName(e.target.value);
+            setSelectedMonth("");
+          }}
+          placeholder="Enter custom budget name"
+          className="w-full p-2 mb-4 border rounded"
+        />
+
+        {!isDuplicate && (selectedMonth || customBudgetName.trim()) && (
           <div>
             <label htmlFor="budget" className="block text-sm font-medium mb-2">
-              Enter Monthly Budget
+              Enter Budget Amount
             </label>
             <input
               type="number"
@@ -133,13 +160,12 @@ export default function SelectMonthBudget() {
           </div>
         )}
 
-        {/* Show the submit button only when a month is selected */}
-        {selectedMonth && (
+        {(selectedMonth || customBudgetName.trim()) && (
           <button
             type="submit"
             className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
-            {isDuplicate ? "View Month Chart" : "Submit"}
+            {isDuplicate ? "View Budget Chart" : "Submit"}
           </button>
         )}
       </form>
