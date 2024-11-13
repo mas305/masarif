@@ -2,6 +2,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useContext } from "react";
 import { RecordContext } from "../context/RecordContext";
 import { PrimaryBtn } from "../components/common/PrimaryBtn";
+import PieChart from "../components/charts/PieChart";
+import MasrofForm from "../components/common/MasrofFrom";
 
 export default function HomePage() {
   const location = useLocation();
@@ -23,6 +25,34 @@ export default function HomePage() {
     navigate(path, { state: { id } });
   };
 
+  // Get items and budget from the record
+  const items = record?.items || [];
+  const totalBudget = parseFloat(record?.budget) || 0;
+
+  const otherItems = items.filter((item) => item.category === "other");
+
+  // Calculate total prices for basics and others
+  const basicsItems = items.filter((item) => item.category === "basics");
+  const totalBasicsPrice = basicsItems.reduce(
+    (total, item) => total + parseFloat(item.price),
+    0
+  );
+
+  const totalOthersPrice = items
+    .filter((item) => item.category === "other")
+    .reduce((total, item) => total + parseFloat(item.price), 0);
+
+  // Calculate available budget
+  const totalSpent = totalBasicsPrice + totalOthersPrice;
+  const availableBudget = totalBudget - totalSpent;
+
+  // Data for budget distribution
+  const budgetDistributionData = [
+    { itemName: "Basics", price: totalBasicsPrice },
+    { itemName: "Others", price: totalOthersPrice },
+    { itemName: "Available", price: availableBudget },
+  ];
+
   return (
     <div className="App">
       <header className="App-header">
@@ -36,7 +66,7 @@ export default function HomePage() {
               <strong>Year:</strong> {record.year}
             </p>
             <p>
-              <strong>Month:</strong> {record.month}
+              <strong>Month:</strong> {record.budgetName}
             </p>
             <p>
               <strong>Budget:</strong> ${record.budget}
@@ -64,6 +94,18 @@ export default function HomePage() {
           text="تعديل مصروف الشهر"
         />
       </div>
+
+      {/* PieChart Component for Budget Distribution */}
+      <PieChart
+        chartItems={budgetDistributionData}
+        title="Budget Distribution"
+      />
+
+      <PieChart chartItems={basicsItems} title="Budget Distribution" />
+
+      <PieChart chartItems={otherItems} title="Budget Distribution" />
+
+      <MasrofForm />
     </div>
   );
 }

@@ -46,6 +46,7 @@ export function MonthChartPage() {
     { itemName: "Others", price: totalOthersPrice },
     { itemName: "Available", price: availableBudget },
   ];
+  
 
   return (
     <div className="max-w-md mx-auto p-4 bg-white shadow-md rounded">
